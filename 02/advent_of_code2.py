@@ -1,37 +1,22 @@
 """Advent of code day 2"""
 
-def check_increasing(number_list, depth):
+def check_increasing(number_list):
     """check increasing"""
 
-    temp_list = number_list
-    if depth >= 2:
-        return False
-    
-    for i in range(0,len(temp_list) - 1):
-        if int(temp_list[i]) >= int(temp_list[i + 1]):
-            temp_list.pop(i)
-            print(temp_list)
-            return check_increasing(temp_list, depth + 1)
-        if int(temp_list[i + 1]) - int(temp_list[i]) > 3:
-            print(temp_list)
-            temp_list.pop(i)
-            return check_increasing(temp_list, depth + 1)
+    for i in range(0, len(number_list) - 1):
+        if int(number_list[i]) > int(number_list[i + 1]):
+            return False
+        if abs(int(number_list[i + 1]) - int(number_list[i])) > 3 or abs(int(number_list[i]) - int(number_list[i + 1])) == 0:
+            return False
     return True
 
-def check_decreasing(number_list, depth):
+def check_decreasing(number_list):
     """check decreasing"""
-    temp_list = number_list
-    if depth >= 2:
-        return False
-    for i in range(0, len(temp_list) - 1):
-        if int(temp_list[i]) <= int(temp_list[i + 1]):
-            temp_list.pop(i)
-            print(temp_list)
-            return check_decreasing(temp_list, depth + 1)
-        if int(temp_list[i]) - int(temp_list[i + 1]) > 3:
-            temp_list.pop(i)
-            print(temp_list)
-            return check_decreasing(temp_list, depth + 1)
+    for i in range(0, len(number_list) - 1):
+        if int(number_list[i]) < int(number_list[i + 1]):
+            return False
+        if abs(int(number_list[i]) - int(number_list[i + 1])) > 3 or abs(int(number_list[i]) - int(number_list[i + 1])) == 0:
+            return False
     return True
 
 
@@ -46,11 +31,21 @@ for item in string_list:
     item_list.append(item.split(" "))
 
 answ = 0
+answers = []
 
 for item in item_list:
-    if check_decreasing(item, 0) or check_increasing(item, 0):
-        print(item)
-        answ += 1
+    #print(item)
+    for i in range (0, len(item)):
+
+        item_copy = item[:]
+        item_copy.pop(i)
+        print(item_copy)
+
+        if check_decreasing(item_copy) or check_increasing(item_copy):
+            answ += 1
+            answers.append(item)
+            print(f" PASS : {item_copy}")
+            break
 
 print(answ)
 
