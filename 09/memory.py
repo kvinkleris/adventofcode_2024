@@ -79,23 +79,38 @@ def format_second_method():
     ele_to_insert = memory_list[p2]
     insert_needed = False
     counter = 0
-    while p1 < p2 and counter < 20:
+    print(memory_list)
+    
+    formated_file = open("formated_memory.txt", "w")
+    formated_file.write(",".join(map(str, memory_list)))
+
+    prints_file = open("prints_file.txt", "a")
+    while p2 >= 0:
         counter += 1
         if insert_needed is True:
             if curr_space_to_insert >= elements_to_insert:
-                print(f"inserting elements start index {p1 - curr_space_to_insert} end index is {p1 + elements_to_insert} insert ele {ele_to_insert} amount to insert is {elements_to_insert}")
+                prints_file.write(f" p1 is : {p1} p2 is {p2} inserting elements start index {p1 - curr_space_to_insert} end index is {p1 - curr_space_to_insert + elements_to_insert} insert ele {ele_to_insert} amount to insert is {elements_to_insert} curr_space_to_insert {curr_space_to_insert} \n")
                 memory_list[p1 - curr_space_to_insert : p1 - curr_space_to_insert + elements_to_insert] = [ele_to_insert] * elements_to_insert
-                memory_list[p2 :p2+ elements_to_insert] = ['.'] * elements_to_insert
+                memory_list[p2 +1:p2+ elements_to_insert +1] = ['.'] * elements_to_insert
+                #print(memory_list)
                 p1 = 0
                 insert_needed = False
                 ele_to_insert = memory_list[p2]
                 elements_to_insert = 0
+                curr_space_to_insert = 0
+
             else:
                 if memory_list[p1] == '.':
                     curr_space_to_insert += 1
                     p1 += 1
                 else:
                     p1 += 1
+                    curr_space_to_insert = 0
+                if (p1 > p2 + 1):
+                    p1 = 0
+                    insert_needed = False
+                    ele_to_insert = memory_list[p2]
+                    elements_to_insert = 0
                     curr_space_to_insert = 0
         else:
             if memory_list[p2] != '.' and ele_to_insert == memory_list[p2]:
@@ -105,8 +120,9 @@ def format_second_method():
                 insert_needed = True
             else:
                 p2 -= 1
-        print(f"{p1} {p2} {elements_to_insert} {insert_needed}")
-        print(memory_list)
+                ele_to_insert = memory_list[p2]
+        #print(f"{p1} {p2} {elements_to_insert} {insert_needed}")
+       #print(memory_list)
         #print(memory_list)
 
                 
@@ -114,11 +130,16 @@ def format_second_method():
 
 
 
-formated_file = open("formated_memory.txt", "w")
-
 answ = 0
 
 
 format_second_method()
-#print(answ)
-#formated_file.write(",".join(map(str, memory_list)))
+#print(memory_list)
+for i in range(0, len(memory_list)):
+    if memory_list[i] != '.':
+        answ += i * memory_list[i]
+print(answ)
+
+    
+formated_file = open("answer_memory.txt", "w")
+formated_file.write(",".join(map(str, memory_list)))
