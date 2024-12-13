@@ -71,33 +71,47 @@ def insert_into_list(num_to_insert, count_to_insert, index_to_remove):
                 break
         
 def format_second_method():
-    """Format memory string by second method"""
-    dict_of_blocks = {}
-    max_value = 0
-    for index_j, item in enumerate(memory_list):
-        if index_j % 1000 == 0:
-            print(f"formatting  {index_j}/{len(memory_list)}")
-        if item != '.':
-            if int(item) > max_value:
-                max_value = int(item)
-        if item not in dict_of_blocks and item != '.':
-            dict_of_blocks[item] = {"elem_num" : item, "block_size" : 1, "starting_index" : index_j}
-        elif item in dict_of_blocks:
-            dict_of_blocks[item]["block_size"] = dict_of_blocks[item]["block_size"] + 1
+
+    p1 = 0
+    p2 = len(memory_list) - 1
+    curr_space_to_insert = 0
+    elements_to_insert = 0
+    ele_to_insert = memory_list[p2]
+    insert_needed = False
+    counter = 0
+    while p1 < p2 and counter < 20:
+        counter += 1
+        if insert_needed is True:
+            if curr_space_to_insert >= elements_to_insert:
+                print(f"inserting elements start index {p1 - curr_space_to_insert} end index is {p1 + elements_to_insert} insert ele {ele_to_insert} amount to insert is {elements_to_insert}")
+                memory_list[p1 - curr_space_to_insert : p1 - curr_space_to_insert + elements_to_insert] = [ele_to_insert] * elements_to_insert
+                memory_list[p2 :p2+ elements_to_insert] = ['.'] * elements_to_insert
+                p1 = 0
+                insert_needed = False
+                ele_to_insert = memory_list[p2]
+                elements_to_insert = 0
+            else:
+                if memory_list[p1] == '.':
+                    curr_space_to_insert += 1
+                    p1 += 1
+                else:
+                    p1 += 1
+                    curr_space_to_insert = 0
         else:
-            continue
+            if memory_list[p2] != '.' and ele_to_insert == memory_list[p2]:
+                elements_to_insert += 1
+                p2 -= 1
+            elif elements_to_insert >= 1:
+                insert_needed = True
+            else:
+                p2 -= 1
+        print(f"{p1} {p2} {elements_to_insert} {insert_needed}")
+        print(memory_list)
+        #print(memory_list)
 
-    #print(dict_of_blocks)
+                
 
 
-
-
-    for value in range (max_value, 0, -1):
-        if value in dict_of_blocks:
-            #print(value)
-            insert_into_list(dict_of_blocks[value]["elem_num"], dict_of_blocks[value]["block_size"], dict_of_blocks[value]["starting_index"])
-
-    #print(memory_list)
 
 
 formated_file = open("formated_memory.txt", "w")
