@@ -1,3 +1,5 @@
+from collections import deque
+
 map_file = open("warehouse.txt", "r")
 map_data = [list(x) for x in  map_file.read().split("\n")]
 move_file = open("moves.txt","r")
@@ -12,6 +14,41 @@ for y_index, row in enumerate(map_data):
             robot_coords_y = y_index
 
 print(f"Robot coordinates are {robot_coords_x} {robot_coords_y}")
+
+def expand_map(old_map):
+    new_map = []
+    new_x = 0
+    new_y = 0
+    for index_i, row in enumerate(old_map):
+        new_row = []
+        for index_j, ele in enumerate(row):
+            if ele == '#':
+                new_row.append('#')
+                new_row.append('#')
+            elif ele == '.':
+                new_row.append('.')
+                new_row.append('.')
+            elif ele == 'O':
+                new_row.append('[')
+                new_row.append(']')
+            elif ele == '@':
+                new_y = index_i * 2
+                new_x = index_j * 2
+                new_row.append('@')
+                new_row.append('.')
+        new_map.append(new_row[:])
+        #new_map[new_y][new_x] = '@'
+    print(new_map)
+    return new_map
+
+newer_map = expand_map(map_data)
+
+
+for y_index, row in enumerate(newer_map):
+    for x_index,ele in enumerate(row):
+        if ele == '@':
+            robot_coords_x = x_index
+            robot_coords_y = y_index
 
 def calculate_answer(map_data):
     """Calculate distance of O values from map edges"""
@@ -114,19 +151,103 @@ def execute_move(ele, robot_x, robot_y):
             return (robot_y + 1, robot_x)
         
 
-def print_map():
+def print_map(map_to_print):
     """Print map array"""
     print("--------------------------")
-    for line in map_data:
+    for line in map_to_print:
         print(line)
     print("--------------------------")
-for move in move_data:
+
+
+#for move in move_data:
     #print_map()
-    coords_tuple = execute_move(move, robot_coords_x, robot_coords_y)
-    print(f"returned tuple {coords_tuple}")
-    robot_coords_y = coords_tuple[0]
-    robot_coords_x = coords_tuple[1]
+    #coords_tuple = execute_move(move, robot_coords_x, robot_coords_y)
+    #print(f"returned tuple {coords_tuple}")
+    #robot_coords_y = coords_tuple[0]
+    #robot_coords_x = coords_tuple[1]
+
+def calculate_two(big_map, pos_x, pos_y):
+    """calculate answer of second_item"""
+    move_actions = {}
+    move_actions["^"] = {"x" : 0, "y" : -1}
+    move_actions["v"] = {"x" : 0, "y" : 1}
+    move_actions["<"] = {"x" : -1, "y": 0}
+    move_actions[">"] = {"x" : +1, "y" : 0}
+    for action in move_data:
+        print(action)
+        print(f"Curr position is {pos_y} {pos_x}")
+        inc_x = move_actions[action]["x"]
+        inc_y = move_actions[action]["y"]
+        new_pos_x = pos_x + inc_x
+        new_pos_y = pos_y + inc_y
+        print(len(big_map))
+        print(len(big_map[0]))
+        print(f"newer position is {new_pos_y} {new_pos_x}")
+        if big_map[new_pos_y][new_pos_x] == '#':
+            continue
+        elif big_map[new_pos_y][new_pos_x] == '.':
+            big_map[new_pos_y][new_pos_x] = '@'
+            big_map[pos_y][pos_x] = '.'
+            pos_y = new_pos_y
+            pos_x = new_pos_x
+        elif big_map[new_pos_y][new_pos_x] == 'O' or \
+             big_map[new_pos_y][new_pos_x] == '[' or \
+             big_map[new_pos_y][new_pos_x] == ']':
+                Q = deque([(new_pos_y, new_pos_x)])
+                SEEN = set()
+                ok = True
+                while Q:
+                    q_ele = Q.popleft()
+                    SEEN.add(q_ele)
+                    print(q_ele)
+                    old_pos_y = q_ele[0]
+                    old_pos_x = q_ele[1]
+
+                    new_pos_x = old_pos_x + inc_x
+                    new_pos_y = old_pos_y + inc_y
+                    if (new_pos_y, new_pos_x) in SEEN:
+                        continue
+                    print(f"new pos y is {new_pos_y} and new_pos_x {new_pos_x}")
+                    if big_map[new_pos_y][new_pos_x] == '#':
+                        ok = False
+                        break
+                    if big_map[new_pos_y][new_pos_x] == '[':
+                        Q.append((new_pos_y, new_pos_x))
+                        Q.append((new_pos_y, new_pos_x +1))
+                    if big_map[new_pos_y][new_pos_x] == ']':
+                        Q.append((new_pos_y, new_pos_x))
+                        Q.append((new_pos_y, new_pos_x +1))
+                    if big_map[new_pos_y][new_pos_x] == 'O':
+                        Q.append((new_pos_y, new_pos_x))
+                if ok is True:
+                    while len(SEEN) > 0:
+                        print(SEEN)
+                        for item in sorted(SEEN):
+                            new_pos_y = item[0] + inc_y
+                            new_pos_x = item[1] + inc_x
+                            if (new_pos_y, new_pos_x) not in SEEN:
+                                big_map[new_pos_y][new_pos_x] = big_map[item[0]][item[1]]
+                                big_map[item[0]][item[1]] = '.'
+                            SEEN.remove(item)
+                    big_map[new_pos_y][new_pos_x] = '@'
+                    big_map[pos_y][pos_x] = '.'
+                    pos_y = new_pos_y
+                    pos_x = new_pos_x
+        print_map(big_map)    
+    return big_map[:]
+                    
+#print(calculate_answer(map_data))
+
+answ_big_map = calculate_two(newer_map, robot_coords_x, robot_coords_y)
+
+print_map(answ_big_map)
 
 
-print(calculate_answer(map_data))
+for row in newer_map:
+    print(row)
+
+
+
+
+
     
