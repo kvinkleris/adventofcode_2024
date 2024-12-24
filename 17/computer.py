@@ -6,7 +6,7 @@ REGISTER_C = 0
 
 PROGRAM_COUNTER = 0
 
-OUTPUT_LIST = []
+
 
 def calc_combo_operand(operand):
     global REGISTER_A
@@ -36,7 +36,7 @@ def load_data(data_to_parse):
 
 INSTRUCTIONS = load_data(data)
 
-print(INSTRUCTIONS)
+#print(INSTRUCTIONS)
 
 def adv(operand):
     global REGISTER_A
@@ -93,32 +93,63 @@ def cdv(operand):
     PROGRAM_COUNTER += 2
 
 counter = 0
-while(PROGRAM_COUNTER < len(INSTRUCTIONS)):
-    print(INSTRUCTIONS[PROGRAM_COUNTER])
-    op_code = INSTRUCTIONS[PROGRAM_COUNTER]
-    curr_operand = INSTRUCTIONS[PROGRAM_COUNTER+1]
-    if op_code == 0:
-        adv(curr_operand)
-    if op_code == 1:
-        bxl(curr_operand)
-    if op_code == 2:
-        bst(curr_operand)
-    if op_code == 3:
-        jnz(curr_operand)
-    if op_code == 4:
-        bxc(curr_operand)
-    if op_code == 5:
-        out(curr_operand)
-    if op_code == 6:
-        bdv(curr_operand)
-    if op_code == 7:
-        cdv(curr_operand)
+def do_instructions(reg_a_value):
+    global REGISTER_A
+    REGISTER_A = reg_a_value
+    #print(REGISTER_A)
+    while(PROGRAM_COUNTER < len(INSTRUCTIONS)):
+        #print(INSTRUCTIONS[PROGRAM_COUNTER])
+        op_code = INSTRUCTIONS[PROGRAM_COUNTER]
+        curr_operand = INSTRUCTIONS[PROGRAM_COUNTER+1]
+        if op_code == 0:
+            adv(curr_operand)
+        if op_code == 1:
+            bxl(curr_operand)
+        if op_code == 2:
+            bst(curr_operand)
+        if op_code == 3:
+            jnz(curr_operand)
+        if op_code == 4:
+            bxc(curr_operand)
+        if op_code == 5:
+            out(curr_operand)
+        if op_code == 6:
+            bdv(curr_operand)
+        if op_code == 7:
+            cdv(curr_operand)
+reg_a_value = 121
+counter += 1
+OUTPUT_LIST = []
 
 
+#do_instructions(reg_a_value)
 
-answ_string = ""
-for num in OUTPUT_LIST:
-    answ_string += str(num)
-    answ_string += ','
+def find_part_two(answ, program):
+    b = 0
+    c = 0 
+    if program == []:
+        return answ
+    for t in range(8):
+        a = answ << 3 | t
+        b = a % 8
 
-print(answ_string[0:len(answ_string) - 1])
+        b = b ^ 3
+
+        c = a // (2 ** b)
+
+        b = b ^ c
+
+        b = b << 3
+
+        a = a // (2 ** 3)
+
+        if b % 8 == program[-1]:
+            sub = find_part_two(a, program[:-1])
+            if sub is None:
+                continue
+            return sub
+ANSWER = find_part_two(0, INSTRUCTIONS)
+print(ANSWER)
+            
+
+
