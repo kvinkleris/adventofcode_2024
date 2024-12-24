@@ -76,6 +76,7 @@ def out(operand):
     global PROGRAM_COUNTER
     global OUTPUT_LIST
     OUTPUT_LIST.append(calc_combo_operand(operand) % 8)
+    print(calc_combo_operand(operand) % 8)
     PROGRAM_COUNTER += 2
 
 def bdv(operand):
@@ -117,20 +118,22 @@ def do_instructions(reg_a_value):
             bdv(curr_operand)
         if op_code == 7:
             cdv(curr_operand)
-reg_a_value = 121
 counter += 1
 OUTPUT_LIST = []
 
 
 #do_instructions(reg_a_value)
 
+do_instructions(5)
+
 def find_part_two(answ, program):
     b = 0
     c = 0 
+    print(program, answ)
     if program == []:
         return answ
     for t in range(8):
-        a = answ << 3 | t
+        a = (answ << 3) | t
         b = a % 8
 
         b = b ^ 3
@@ -142,7 +145,6 @@ def find_part_two(answ, program):
         b = b << 3
 
         a = a // (2 ** 3)
-
         if b % 8 == program[-1]:
             sub = find_part_two(a, program[:-1])
             if sub is None:
