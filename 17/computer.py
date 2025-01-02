@@ -76,7 +76,8 @@ def out(operand):
     global PROGRAM_COUNTER
     global OUTPUT_LIST
     OUTPUT_LIST.append(calc_combo_operand(operand) % 8)
-    print(calc_combo_operand(operand) % 8)
+    #print(calc_combo_operand(operand) % 8)
+    print(OUTPUT_LIST)
     PROGRAM_COUNTER += 2
 
 def bdv(operand):
@@ -97,8 +98,9 @@ counter = 0
 def do_instructions(reg_a_value):
     global REGISTER_A
     REGISTER_A = reg_a_value
-    #print(REGISTER_A)
+
     while(PROGRAM_COUNTER < len(INSTRUCTIONS)):
+        #print(f"REGISTER A IS {REGISTER_A}")
         #print(INSTRUCTIONS[PROGRAM_COUNTER])
         op_code = INSTRUCTIONS[PROGRAM_COUNTER]
         curr_operand = INSTRUCTIONS[PROGRAM_COUNTER+1]
@@ -121,37 +123,46 @@ def do_instructions(reg_a_value):
 counter += 1
 OUTPUT_LIST = []
 
+do_instructions(108107566389757)
 
-#do_instructions(reg_a_value)
-
-do_instructions(5)
-
+print(OUTPUT_LIST)
 def find_part_two(answ, program):
+    global OUTPUT_LIST
     b = 0
     c = 0 
-    print(program, answ)
+    
     if program == []:
+        #print(answ)
         return answ
     for t in range(8):
-        a = (answ << 3) | t
-        b = a % 8
+        #print(t)
+        if len(program) == 16:
+            a = 3
+        else:
+            a = (answ << 3) | t
+        b = a % 8 
 
         b = b ^ 3
 
         c = a // (2 ** b)
 
         b = b ^ c
+        b = b ^ 3
 
-        b = b << 3
-
-        a = a // (2 ** 3)
         if b % 8 == program[-1]:
+            #print(f"a is {a} b is {b % 8} program is {program}, answ is {answ} ")
+
             sub = find_part_two(a, program[:-1])
+            do_instructions(sub)
+            #print(f'result of instruction set is {OUTPUT_LIST}')
             if sub is None:
                 continue
             return sub
+#print(INSTRUCTIONS)
 ANSWER = find_part_two(0, INSTRUCTIONS)
 print(ANSWER)
+
+
             
 
 
