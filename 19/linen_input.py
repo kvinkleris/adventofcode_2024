@@ -12,8 +12,8 @@ def read_files():
 
 DESIGNS, COMBOS = read_files()
 
-
-def DFS(curr_word, goal_word, answ):
+memoization_dict = {}
+def DFS(curr_word, goal_word, answ, prev_word):
     """Find all possible word combos"""
     curr_word = curr_word.replace(" ", "")
 
@@ -22,14 +22,28 @@ def DFS(curr_word, goal_word, answ):
         return 0
     if curr_word == goal_word:
         #print("return 1")
+        memoization_dict[prev_word] = {"next_word" : curr_word}
         return 1
+    memoization_dict[prev_word] = {"next_word" : curr_word}
     answ = 0
     for design in DESIGNS:
-        answ += DFS(curr_word + design, goal_word, answ)
+        if curr_word + design in memoization_dict:
+            while True:
+                if curr_word + design in memoization_dict:
+                    curr_word = memoization_dict[curr_word+design]["next_word"]
+                    if curr_word == goal_word:
+                        answ += 1
+                else:
+                    break
+        else:
+            answ += DFS(curr_word + design, goal_word, answ, curr_word)
+
+
     return answ
 
 final_answ = 0
 for combo in COMBOS:
-    final_answ += DFS("", combo, 0)
-print(final_answ)
+        final_answ += DFS("", combo, 0, "")
 
+print(memoization_dict)
+print(final_answ)
