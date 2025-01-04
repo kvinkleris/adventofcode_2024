@@ -3,33 +3,22 @@ import heapq
 file = open("memory.txt", "r")
 data = [x for x in  file.read().split("\n")]
 SIZE = 71
-DATA_MAP = [['.']* SIZE for i in range(SIZE)]
-GOAL_Y = SIZE - 1 
+
+GOAL_Y = SIZE - 1
 GOAL_X = SIZE - 1
 
 counter = 0
-for line in data:
-    if counter >= 1024:
-        break
-    counter += 1
-    nums = line.split(",")
-    DATA_MAP[int(nums[1])][int(nums[0])] = '#'
-    
-for line in DATA_MAP:
-    print(line)
-
-
-Q = []
-DIRS = [(-1,0),(0,1),(1,0),(0,-1)]
-SEEN = set()
-d = 0
-heapq.heappush(Q, (0,0, 0, d))
-heapq.heappush(Q, (0,0, 1, d))
-heapq.heappush(Q, (0,0, 2, d))
-heapq.heappush(Q, (0,0, 3, d))
-DATA_MAP[0][0] = 'O'
 
 def search(map):
+    Q = []
+    DIRS = [(-1,0),(0,1),(1,0),(0,-1)]
+    SEEN = set()
+    d = 0
+    heapq.heappush(Q, (0,0, 0, d))
+    heapq.heappush(Q, (0,0, 1, d))
+    heapq.heappush(Q, (0,0, 2, d))
+    heapq.heappush(Q, (0,0, 3, d))
+    DATA_MAP[0][0] = 'O'
     best = None
     counter = 0
     while len(Q) != 0:
@@ -64,9 +53,30 @@ def search(map):
         heapq.heappush(Q, (curr_y, curr_x, 2, curr_dist + 1))
         heapq.heappush(Q, (curr_y, curr_x, 3, curr_dist + 1))
     return best
-best = search(DATA_MAP)
-for row in DATA_MAP:
-    print(row)
-#print(DATA_MAP)
-print(best)
+counter_limit = 1
+stop_loop = False
+last_num_one = 0
+last_num_two = 0
+while True:
+    if stop_loop is True:
+        break
+    DATA_MAP = [['.'] * SIZE for i in range(SIZE)]
+    counter = 0
+    for line in data:
+        counter += 1
+        nums = line.split(",")
+        DATA_MAP[int(nums[1])][int(nums[0])] = '#'
+        if counter >= counter_limit:
+            last_num_one = nums[0]
+            last_num_two = nums[1]
+            counter_limit += 1
+            best = search(DATA_MAP)
+            if best is None:
+                stop_loop = True
+            print(f"counter limit is {counter_limit} and best is {best} last num one is {last_num_one} last num two is {last_num_two}")
+            break
+
+
+
+
 
