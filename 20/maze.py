@@ -23,6 +23,7 @@ def search_map(maze_map):
     heapq.heappush(Q, (START[0], START[1], DIRS[1], 0))
     heapq.heappush(Q, (START[0], START[1], DIRS[2], 0))
     heapq.heappush(Q, (START[0], START[1], DIRS[3], 0))
+    cheat_activated_coords = set()
     while len(Q) != 0:
         y_coords, x_coords, direction, dist = heapq.heappop(Q)
 
@@ -36,6 +37,8 @@ def search_map(maze_map):
 
         if maze_map[y_coords][x_coords] == '#':
             continue
+        if maze_map[y_coords][x_coords] == '1' or maze_map[y_coords][x_coords] == '2':
+            cheat_activated_coords.add((x_coords, y_coords))
 
         if maze_map[y_coords][x_coords] == 'E' and best_dist is None:
             best_dist = dist
@@ -49,7 +52,7 @@ def search_map(maze_map):
         heapq.heappush(Q, (y_coords, x_coords, DIRS[1], dist + 1))
         heapq.heappush(Q, (y_coords, x_coords, DIRS[2], dist + 1))
         heapq.heappush(Q, (y_coords, x_coords, DIRS[3], dist + 1))
-    return best_dist
+    return best_dist, cheat_activated_coords
 
 list_of_maps = []
 removed_walls_set = set()
@@ -63,9 +66,14 @@ for i, row in enumerate(map_data[:-1]):
                 removed_walls_set.add(((i,j), (i+1, j)))
             removed_walls_set.add((i,j))
 
-base_best_dist = search_map(map_data)
+base_best_dist, og = search_map(map_data)
+time_saved_list = []
+counter = 0
+file = open("results.txt", "w")
+routes_taken = set()
 for item in removed_walls_set:
-    new_map = map_data[:]
+    new_map = [item[:] for item in map_data]
+
     item1 = item[0]
     item2 = item[1]
     item3 = None
@@ -77,13 +85,24 @@ for item in removed_walls_set:
         item4 = item[1][1]
     
     if item3 is None and item4 is None:
-        print(new_map[item1][item2])
-        new_map[item1][item2] = '.'
+        #print(new_map[item1][item2])
+        new_map[item1][item2] = '1'
     else:
-        new_map[item1][item2] = '.'
-        new_map[item3][item4] = '.'
-    
-    print(search_map(new_map))
+        new_map[item1][item2] = '1'
+        new_map[item3][item4] = '2'
+    cheat_coords_set = []
+    #file.write("------------------------------------- \n")
+    #for row in new_map:
+        #file.write(str(row))
+        #file.write("\n")
+    #file.write(f"Speed up is {base_best_dist - search_map(new_map)} \n")
+    #file.write("------------------------------------- \n")
+    new_dist, cheat_coords = search_map(new_map)
+    if cheat_coords not in cheat_coords_set:
+        cheat_coords_set.append(cheat_coords)
+        time_saved_list.append(base_best_dist - new_dist)
+    print(cheat_coords_set)
+print(time_saved_list)
     
 
 
