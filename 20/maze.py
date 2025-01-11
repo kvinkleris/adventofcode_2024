@@ -42,10 +42,9 @@ def search_map(maze_map):
         if (y_coords, x_coords, direction) not in DIST:
             DIST[(y_coords, x_coords, direction)] = dist
 
-            
-
         if maze_map[y_coords][x_coords] == 'E' and best_dist is None:
             SEEN.append((y_coords, x_coords, direction))
+            PATH = PATH + [(y_coords, x_coords)]
             best_dist = dist + 1
             return best_dist, PATH
         elif maze_map[y_coords][x_coords] == 'E' and dist is not None and dist < best_dist:
@@ -53,28 +52,28 @@ def search_map(maze_map):
         if (y_coords, x_coords, direction) in SEEN:
             continue
         else:
-            SEEN.append((y_coords, x_coords, direction))
-        NEW_PATH = PATH + [(y_coords, x_coords)]    
-        heapq.heappush(Q, (y_coords, x_coords, DIRS[0], dist + 1, NEW_PATH))
-        heapq.heappush(Q, (y_coords, x_coords, DIRS[1], dist + 1, NEW_PATH))
-        heapq.heappush(Q, (y_coords, x_coords, DIRS[2], dist + 1, NEW_PATH))
-        heapq.heappush(Q, (y_coords, x_coords, DIRS[3], dist + 1, NEW_PATH))
+            SEEN.append((y_coords, x_coords, direction))     
+        heapq.heappush(Q, (y_coords, x_coords, DIRS[0], dist + 1, PATH + [(y_coords, x_coords)]))
+        heapq.heappush(Q, (y_coords, x_coords, DIRS[1], dist + 1, PATH + [(y_coords, x_coords)]))
+        heapq.heappush(Q, (y_coords, x_coords, DIRS[2], dist + 1, PATH + [(y_coords, x_coords)]))
+        heapq.heappush(Q, (y_coords, x_coords, DIRS[3], dist + 1, PATH + [(y_coords, x_coords)]))
     return best_dist
-
-list_of_maps = []
-removed_walls_set = set()
-
-for i, row in enumerate(map_data[:-1]):
-    for j, ele in enumerate(row[:-1]):
-        if ele == '#':
-            if map_data[i][j+1] == '#':
-                removed_walls_set.add( ((i,j), (i, j+1)))
-            if map_data[i+1][j] == '#':
-                removed_walls_set.add(((i,j), (i+1, j)))
-            removed_walls_set.add((i,j))
 
 base_best_dist, BEST_PATH = search_map(map_data)
 
+for item in BEST_PATH:
+    map_data[item[0]][item[1]] = 'F'
+
+
+
+def print_maze_map_file(maze_map):
+    write_file = open("results.txt", "w")
+    for row in maze_map:
+        write_file.write(str(row))
+        write_file.write("\n")
+    write_file.close()
+
+print_maze_map_file(map_data)
 
 def cheats(track, max_dist):
     """Calculate possible speedups using cheats"""
@@ -87,9 +86,9 @@ def cheats(track, max_dist):
             y2, x2 = track[t2]
             dist = abs(x2 - x1) + abs(y2 - y1)
             if dist <= max_dist and t2 - t1 > dist:
-                speedup_counter[t2 - t1 + dist] += 1
+                speedup_counter[t2 - t1 - dist] += 1
     return speedup_counter
-speed_counter = cheats(BEST_PATH, 2)
+speed_counter = cheats(BEST_PATH, 20)
 final_answ = 0
 print(speed_counter)
 for key in speed_counter:
