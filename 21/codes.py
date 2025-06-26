@@ -34,7 +34,7 @@ def move(pos, dr):
     return pos
 
 cache = {}
-def adj(input_tuple):
+def solve(input_tuple):
     if input_tuple not in cache:
         target, a1, a2, a3 = input_tuple
 
