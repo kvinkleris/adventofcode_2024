@@ -1,5 +1,6 @@
 import sys
-
+from heapq import heappush as hpush, heappop as hpop
+from collections import defaultdict as dd
 file_lines = open("data.txt","r").read().split("\n")
 #print(file_lines)
 
@@ -34,61 +35,74 @@ def move(pos, dr):
     return pos
 
 cache = {}
-def solve(input_tuple):
+file_to_write = open("file_to_write.txt", "w")
+
+def adjs(input_tuple):
     if input_tuple not in cache:
         target, a1, a2, a3 = input_tuple
 
         if len(target) == 0:
-            print(f"Reached target with {input_tuple}")
-            #p#rint(result)
             return 0
 
-       
-            
-        result = float('inf')  # Use infinity instead of large number
-        cache[input_tuple] = result
-        #print(input_tuple)
-        #print(target,a1,a2,a3)
+        # Try all possible moves and find the minimum
         for posskey in mapping2.values():
+
             if posskey == "A":
                 a3action = mapping2[a3]
                 if a3action == "A":
                     a2action = mapping2[a2]
                     if a2action == "A":
                         a1key = mapping[a1]
-                        #print(f"{a1key} and {target[0]} ")
                         if a1key == target[0]:
-                            #print(f"{a1key} and {target[0]}  are the same... moving to next target")
-                            result = min(result, 1 + solve((target[1:], a1, a2, a3)))
-
-                        # else: do nothing (invalid move)
+                            # Successfully pressed target character
+                            yield 1, (target[1:], a1, a2, a3)
+                        else:
+                             pass
                     else:
+                        # a2 moves a1
                         newa1 = move(a1, a2action)
                         if newa1 in mapping.keys():
-                            result = min(result, 1 + solve((target, newa1, a2, a3)))
-                        # else: do nothing (invalid move)
+                            yield 1, (target, newa1, a2, a3)
+                        else:
+                            pass
                 else:
+                    # a3 moves a2
                     newa2 = move(a2, a3action)
                     if newa2 in mapping2.keys():
-                        result = min(result, 1 + solve((target, a1, newa2, a3)))
-                    # else: do nothing (invalid move)
+                        yield 1, (target, a1, newa2, a3)
+                    else:
+                        pass
             else:
+                # Move a3
                 newa3 = move(a3, posskey)
                 if newa3 in mapping2.keys():
-                    result = min(result, 1 + solve((target, a1, a2, newa3)))
-                    
-                # else: do nothing (invalid move)
-        
-        cache[input_tuple] = result
-        #print(f"Cache updated for {input_tuple}: {result}")
-    return cache[input_tuple]
+                    yield 1, (target, a1, a2, newa3)
+                else:
+                    pass
 
-# Process each line from the file
-res = 0
+def sol(c):
+    start = (c, m1T["A"], m2T["A"], m2T["A"])
+    pq = []
+    hpush(pq, (0, start))  # (cost, state
+    dists =  dd(lambda: float('inf'))
+    dists[start] = 0
+    while len(pq) > 0:
+        dist, cur = hpop(pq)
+        if len(cur[0]) == 0:
+            print(f"Reached target with steps: {cur[1]}\n")
+            return dist
+        for d, adj in adjs(cur):
+            if dist + d < dists[adj]:
+                dists[adj] = dist + d
+                hpush(pq, (dists[adj], adj))
+
+final_answ = 0
 for c in file_lines:
-    if c.strip():  # Skip empty lines
-        cache.clear()
-        res_two = solve((c, m1T["A"], m2T["A"], m2T["A"]))
-        print(res_two)
-        res+= int(c[:-1]) * res_two
-print(res)
+    sval = sol(c)
+    print(f"Code: {c}, Min moves: {sval}\n")
+    print((int(c[:-1]), c[1:]))
+    final_answ += sval * int(c[:-1])
+
+print(f"final_answ: {final_answ}\n")
+
+file_to_write.close()
