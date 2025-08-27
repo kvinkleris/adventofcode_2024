@@ -21,10 +21,10 @@ m1T = {v:k for k, v in mapping.items()}
 mapping2 = {(0,1) : "^",
             (0,2) : "A",
             (1,0) : "<",
-            (1,1) : "⌄",
+            (1,1) : "v",
             (1,2) : ">",}
 
-movement_map = {"^": (-1, 0),  "<": (0, -1), "⌄": (1, 0), ">": (0, 1)}
+movement_map = {"^": (-1, 0),  "<": (0, -1), "v": (1, 0), ">": (0, 1)}
 
 m2T = {v:k for k, v in mapping2.items()}
 
@@ -131,7 +131,7 @@ def required(sx, sy, ex, ey, gridtype):
     #print(dy)
     xcount = round((ex-sx) / dx) if dx != 0 else 0
     ycount = round((ey-sy) / dy) if dy != 0 else 0
-    xvar = "⌄" if dx == 1 else "^"
+    xvar = "v" if dx == 1 else "^"
     yvar = ">" if dy == 1 else "<"
     if gridtype == 1:
         bad1 = (m1T["7"], m1T["4"], m1T["1"])
@@ -140,6 +140,8 @@ def required(sx, sy, ex, ey, gridtype):
         #yield xcount * xvar + ycount * yvar
         if ((sx, sy) in bad1 and (ex,ey) in bad2):
             yield ycount * yvar + xcount * xvar
+        elif ((sx, sy) in bad2 and (ex,ey) in bad1):
+            yield xcount * xvar + ycount * yvar
         else:
             yield ycount * yvar + xcount * xvar
             yield xcount * xvar + ycount * yvar
@@ -148,7 +150,7 @@ def required(sx, sy, ex, ey, gridtype):
         bad2 = (m2T["^"], m2T["A"])
         if ((sx, sy)) in bad1 and (ex, ey) in bad2:
             yield ycount * yvar + xcount * xvar
-        elif ((sx, sy)) in bad2 and (ex, ey) in bad2:
+        elif ((sx, sy)) in bad2 and (ex, ey) in bad1:
             yield xcount * xvar + ycount * yvar
         else:
             yield ycount * yvar + xcount * xvar
@@ -183,16 +185,14 @@ def solve(seq, n, maxn, depth = 0):
     #print(f" answer :  {depth}-> {cache[seq, n, maxn]}")
     return cache[seq, n, maxn]
 
-print(solve("8", 3, 3, 0))
+print(solve("029A", 3, 3, 0))
 #print(solV("0"))
 
 final_answ = 0
 for c in file_lines:
     sval = solve(c, 26, 26, 0)
-    sval2 = solV(c)
-    print(f"Code: {c}, SolV: {sval2}\n")
-    print(f"Code: {c}, Min moves: {sval}\n")
-    print((int(c[:-1]), c[1:]))
+    #sval2 = solV(c)
+    print((int(c[:-1]), c))
     final_answ += sval * int(c[:-1])
 
 print(f"final_answ: {final_answ}\n")
