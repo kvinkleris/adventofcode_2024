@@ -134,22 +134,25 @@ def required(sx, sy, ex, ey, gridtype):
     xvar = "⌄" if dx == 1 else "^"
     yvar = ">" if dy == 1 else "<"
     if gridtype == 1:
-        bad1 = (m1T("7"), m1T("4"), m1T["1"])
+        bad1 = (m1T["7"], m1T["4"], m1T["1"])
         bad2 = (m1T["0"], m1T["A"])
         #yield ycount * yvar + xcount * xvar
         #yield xcount * xvar + ycount * yvar
         if ((sx, sy) in bad1 and (ex,ey) in bad2):
-            yield ycount * yvar * xcount * xvar
+            yield ycount * yvar + xcount * xvar
         else:
             yield ycount * yvar + xcount * xvar
             yield xcount * xvar + ycount * yvar
     else:
-        bad1 = (m1T("7"), m1T("4"), m1T["1"])
-        bad2 = (m1T["0"], m1T["A"])
-        if dx == -1:
-            return ycount * yvar + xcount * xvar
+        bad1 = (m2T["<"])
+        bad2 = (m2T["^"], m2T["A"])
+        if ((sx, sy)) in bad1 and (ex, ey) in bad2:
+            yield ycount * yvar + xcount * xvar
+        elif ((sx, sy)) in bad2 and (ex, ey) in bad2:
+            yield xcount * xvar + ycount * yvar
         else:
-            return xcount * xvar + ycount * yvar
+            yield ycount * yvar + xcount * xvar
+            yield xcount * xvar + ycount * yvar
 
 
 
@@ -166,7 +169,13 @@ def solve(seq, n, maxn, depth = 0):
         mtype = 1 if n == maxn else 2
         count = 0
         for des in seq + ("A" if n != maxn else ""):
-            count += solve(required(*mT[cur], *mT[des], mtype), n-1, maxn, depth = depth + 1)
+            bestway = None
+            for way in required(*mT[cur], *mT[des], mtype):
+                if bestway is None:
+                    bestway = solve(way, n-1, maxn, depth = depth + 1)
+                else:
+                    bestway = min(bestway, solve(way, n-1, maxn, depth = depth + 1))
+            count += bestway
             if n == 1:
                 count += 1
             cur = des
@@ -174,12 +183,12 @@ def solve(seq, n, maxn, depth = 0):
     #print(f" answer :  {depth}-> {cache[seq, n, maxn]}")
     return cache[seq, n, maxn]
 
-print(solve("0", 3, 3, 0))
+print(solve("8", 3, 3, 0))
 #print(solV("0"))
 
 final_answ = 0
 for c in file_lines:
-    sval = solve(c, 3, 3, 0)
+    sval = solve(c, 26, 26, 0)
     sval2 = solV(c)
     print(f"Code: {c}, SolV: {sval2}\n")
     print(f"Code: {c}, Min moves: {sval}\n")
