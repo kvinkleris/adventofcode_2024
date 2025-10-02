@@ -1,10 +1,8 @@
 import sys
 sys.setrecursionlimit(100000)
 
-
 with open("inputs.txt") as f:
     s = f.read().strip()
-
 
 def printc(x):
     pyperclip.copy(x)
@@ -39,13 +37,12 @@ for l in gates.split("\n"):
 
 gd["z20"],gd["jgb"] = gd["jgb"],gd["z20"]
 gd["z24"],gd["vcg"] = gd["vcg"],gd["z24"]
-gd["z31"],gd["fqm"] = gd["rvc"],gd["z31"]
- 
+gd["rrs"],gd["rvc"] = gd["rvc"],gd["rrs"]
+gd["z09"],gd["rkf"] = gd["rkf"],gd["z09"]
+#gd["z09"],gd["tcs"] = gd["tcs"],gd["z09"]
+
 def filt(ss):
     return {x for x in ss if x.startswith("x") or x.startswith("y") or x.startswith("z")}
-
-
-
 
 def touched(reg):
     ts = set()
@@ -65,7 +62,6 @@ def touched(reg):
                 dfs(b)
     dfs(reg)
     return 0
-
 
 def pprint(reg, maxdepth = 5, depth = 0):
     if depth > maxdepth:
@@ -125,8 +121,6 @@ def evaluate(x = None,y = None):
         if k not in gloc:
             nott.append(k)
 
-
-
 def inspection():
     for i in range(36):
         for j in range(36):
@@ -140,8 +134,6 @@ def inspection():
 #print(evaluate(2,3))
 inspection()
 
-
-
 def inspection():
     for i in range(45):
         for j in range(45):
@@ -150,17 +142,13 @@ def inspection():
             if evaluate(x,y) != x + y:
                 print(i, j)
 
-#pprint("z09")
-#print()
-#pprint("z20")
-#print()
-#pprint("z21")
-#print()
-#pprint("z24")
-#print()
-#pprint("z25")
-pprint("z31")
+pprint("z09")
 print()
-pprint("z32")
+pprint("z10")
+#pprint("z05")
 print()
-pprint("z05")
+pprint("z08")
+
+print(str((sorted(["z09","rkf","rrs","rvc","z24","vcg","z20","jgb"]))))
+
+#jgb,rkf,rrs,rvc,vcg,z09,z20,z24
