@@ -121,9 +121,9 @@ def solV(c):
                 dists[adj] = dist + d
                 hpush(pq, (dists[adj], adj))
 
-def required(sx, sy, ex, ey, gridtype):
+def required(sx, sy, ex, ey, gridtype, v = False):
 
-    sign = lambda x: (1, -1)[x<0]
+    sign = lambda x: (1, -1)[x < 0]
     #print(f"Values : {sx} {sy} {ex} {ey}")
     dx = sign(ex-sx)
     dy = sign(ey-sy)
@@ -133,6 +133,8 @@ def required(sx, sy, ex, ey, gridtype):
     ycount = round((ey-sy) / dy) if dy != 0 else 0
     xvar = "v" if dx == 1 else "^"
     yvar = ">" if dy == 1 else "<"
+    if v:
+        print(dx,dy,xcount,ycount,xvar,yvar)
     if gridtype == 1:
         bad1 = (m1T["7"], m1T["4"], m1T["1"])
         bad2 = (m1T["0"], m1T["A"])
@@ -153,17 +155,16 @@ def required(sx, sy, ex, ey, gridtype):
         elif ((sx, sy)) in bad2 and (ex, ey) in bad1:
             yield xcount * xvar + ycount * yvar
         else:
-            yield ycount * yvar + xcount * xvar
             yield xcount * xvar + ycount * yvar
+            yield ycount * yvar + xcount * xvar
 
 
 
-#print(required(*m1T['9'], *m1T['A'], 1))
 
 def solve(seq, n, maxn, depth = 0):
     #print(f" depth is {depth}  call is {seq} and n is {n}")
     if n == 0:
-        return len(seq)
+        return len(seq) + 1
     if (seq, n, maxn) not in cache:
         cur = "A"
         m = mapping if n == maxn else mapping2
@@ -178,20 +179,22 @@ def solve(seq, n, maxn, depth = 0):
                 else:
                     bestway = min(bestway, solve(way, n-1, maxn, depth = depth + 1))
             count += bestway
-            if n == 1:
-                count += 1
             cur = des
         cache[seq, n, maxn] = count
     #print(f" answer :  {depth}-> {cache[seq, n, maxn]}")
     return cache[seq, n, maxn]
 
-print(solve("029A", 3, 3, 0))
-#print(solV("0"))
+#print(solve("029A", 3, 3, 0))
+print(solV("029A"))
 
 final_answ = 0
+
+#print(solve("029A",4,43,0))
 for c in file_lines:
-    sval = solve(c, 26, 26, 0)
+    pass
+    sval = solve(c, 26, 26, 1)
     #sval2 = solV(c)
+    #print(sval)
     print((int(c[:-1]), c))
     final_answ += sval * int(c[:-1])
 
